@@ -45,6 +45,6 @@ Future Enhancements:
 
 - Sent this report on the email.
 
-- Trigger the email when server resources are on its peak.
+- Trigger the email when server resources are on its peak usage.
 
 ### Happy learning !!!!
