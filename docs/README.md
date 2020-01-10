@@ -1,1 +1,3 @@
-# Shell-Scripting
+# Shell scripting blogs
+
++ [Know thy server](https://krishwaidande.github.io/Shell-Scripting/server-statistics)
