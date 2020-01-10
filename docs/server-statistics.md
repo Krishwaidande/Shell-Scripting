@@ -30,7 +30,7 @@ The script is checked-in [here](https://github.com/Krishwaidande/Shell-Scripting
 
 The output of the command:
 
-![Server-Statistics](https://github.com/Krishwaidande/Shell-Scripting/blob/master/docs/server-statistics.png)
+![Server-Statistics](server-statistics.png)
 
 Note: There are monitoring tools as well available on the internet like Nagios, Zabbix, etc 
 
