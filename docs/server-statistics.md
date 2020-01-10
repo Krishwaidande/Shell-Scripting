@@ -30,9 +30,9 @@ The script is checked-in [here](https://github.com/Krishwaidande/Shell-Scripting
 
 The output of the command:
 
-![Server-Statistics](https://github.com/Krishwaidande/Shell-Scripting/blob/master/server-statistics.png)
+![Server-Statistics](https://github.com/Krishwaidande/Shell-Scripting/blob/master/docs/server-statistics.png)
 
-#### Note: There are monitoring tools as well available on the internet like [Nagios](https://www.nagios.org/projects/nagios-core/), Zabbix, etc 
+Note: There are monitoring tools as well available on the internet like Nagios, Zabbix, etc 
 
 For learning purposes, it is good to create small scripts and use it to make daily tasks simple.
 
