@@ -15,14 +15,14 @@
   echo "Total Memory : $total MB";
   echo "Used Memory: $used MB";
   echo "Free Memory (Free + Available): $unused MB";
-  echo "Memory in (%): " $(( percentageMem / total ))"%";
+  echo "Used Memory in (%): " $(( percentageMem / total ))"%";
   echo -e "\n";
 
   echo "<---------- Disk Space Status ---------->";
   echo "$diskspace";
   echo -e "\n";
 
-  echo "<---------- CPU Usage  ---------->";
+  echo "<---------- CPU Usage Status  ---------->";
   echo "Top 10 processes sorted by memory usage."
   echo "$sortUsageByMem";
   echo -e "\n";
