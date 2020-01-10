@@ -41,4 +41,10 @@ Note: There are monitoring tools as well available on the internet like Nagios, 
 
 For learning purposes, it is good to create small scripts and use it to make daily tasks simple.
 
+Future Enhancements:
+
+- Sent this report on the email.
+
+- Trigger the email when server resources are on its peak.
+
 ### Happy learning !!!!
