@@ -10,7 +10,29 @@
   diskspace=$(df -h | awk '{ if ( NR > 1) print $0 }')
   sortUsageByMem=$(ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head -10)
   sortUsageByCPU=$(ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%cpu | head -10)
-  
+
+  memUsage=$(( percentageMem / total ))
+  cpuUsage=$(top -b -n 1| head -3 | grep "Cpu(s)" | awk '{print $2 + $4}' | cut -d"." -f1)
+  threshold=90
+
+checkResource() {
+  if [[ $memUsage -gt $threshold ]];
+  then
+    echo "Memory usage is at max";
+  else
+    echo "Memory usage is normal";
+  fi
+
+  if [[ $cpuUsage -gt $threshold ]];
+  then
+    echo "CPU Usage is at max";
+  else
+    echo "CPU usage is normal";
+  fi
+}
+
+ 
+generateReport() {
   echo "<---------- Physical Memory Status ----------";
   echo "Total Memory : $total MB";
   echo "Used Memory: $used MB";
@@ -40,3 +62,10 @@
   else
     netstat -tln | awk '{ if ( NR > 1) print $0 }'
   fi
+}
+
+main(){
+#generateReport;
+checkResource;
+}
+main;
