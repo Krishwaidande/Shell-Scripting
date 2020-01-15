@@ -1,71 +1,62 @@
 #/bin/bash
 
-  total=$(free -m | awk '{ if (NR > 1) print $2 }' | head -1)
-  used=$(free -m | awk '{ if (NR > 1) print $3 }' | head -1)
-  free=$(free -m | awk '{ if (NR > 1) print $4 }' | head -1)
-  available=$(free -m | awk '{ if (NR > 1) print $7 }' | head -1)
-  unused=$((free + available))
-  percentageMem=$(( used*100 ))
-  uid=$(id -u)
-  diskspace=$(df -h | awk '{ if ( NR > 1) print $0 }')
-  sortUsageByMem=$(ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head -10)
-  sortUsageByCPU=$(ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%cpu | head -10)
+mailfile="server-status-$(date +%Y-%m-%d).txt"
+touch $mailfile
 
-  memUsage=$(( percentageMem / total ))
-  cpuUsage=$(top -b -n 1| head -3 | grep "Cpu(s)" | awk '{print $2 + $4}' | cut -d"." -f1)
-  threshold=90
+#Retrive memory information for report.
+totalMem=$(free -m | awk '{ if (NR > 1) print $2 }' | head -1)
+usedMem=$(free -m | awk '{ if (NR > 1) print $3 }' | head -1)
+freeMem=$(free -m | awk '{ if (NR > 1) print $4+$7 }' | head -1)
+sortUsageByMem=$(ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head -10)
 
-checkResource() {
-  if [[ $memUsage -gt $threshold ]];
-  then
-    echo "Memory usage is at max";
-  else
-    echo "Memory usage is normal";
-  fi
+memUsage=$(( (usedMem*100)/totalMem ))
+cpuUsage=$(top -b -n 1| head -3 | grep "Cpu(s)" | awk '{print $2 + $4}' | cut -d"." -f1)
 
-  if [[ $cpuUsage -gt $threshold ]];
-  then
-    echo "CPU Usage is at max";
-  else
-    echo "CPU usage is normal";
-  fi
+memThreshold=30
+cpuThreshold=90
+
+#Mail Properties
+to="krishna@krishagni.com"
+from="krishna.jenkins@gmail.com"
+subject="Alert : $(hostname) server statistics"
+
+setMailProps() {
+  echo "To: $to" >> $mailfile
+  echo "From: $from" >> $mailfile
+  echo "Subject: $subject" >> $mailfile
 }
 
- 
 generateReport() {
-  echo "<---------- Physical Memory Status ----------";
-  echo "Total Memory : $total MB";
-  echo "Used Memory: $used MB";
-  echo "Free Memory (Free + Available): $unused MB";
-  echo "Used Memory in (%): " $(( percentageMem / total ))"%";
+  echo "The server is running on low memory. Below is detailed information about the memory usage." >> $mailfile
+  echo -e "\n" >> $mailfile
+  echo "Total Memory : $totalMem MB" >> $mailfile
+  echo "Used Memory: $usedMem MB" >> $mailfile
+  echo "Free Memory (Free + Available): $freeMem MB" >> $mailfile
+  echo "Used Memory in (%): $memUsage %" >> $mailfile
+  echo -e "\n" >> $mailfile
+
+  echo "Top 10 processes sorted by memory usage." >> $mailfile
+  echo "$sortUsageByMem" >> $mailfile
   echo -e "\n";
+}
 
-  echo "<---------- Disk Space Status ---------->";
-  echo "$diskspace";
-  echo -e "\n";
-
-  echo "<---------- CPU Usage Status  ---------->";
-  echo "Top 10 processes sorted by memory usage."
-  echo "$sortUsageByMem";
-  echo -e "\n";
-
-  echo "Top 10 processes sorted by CPU usage.";
-  echo "$sortUsageByCPU";
-  echo -e "\n";
-
-  echo "<-------- Used Ports On Server --------->";
-  echo "To check the program name run the script with sudo privilege";
-
-  if [ "$uid" -eq 0 ];
+checkResourceAndSendMail() {
+  if [[ $memUsage -gt $memThreshold ]];
   then
-    netstat -tlnp | awk '{ if ( NR > 1) print $0 }'
-  else
-    netstat -tln | awk '{ if ( NR > 1) print $0 }'
+    setMailProps;
+    generateReport;    
+    cat $mailfile | ssmtp -v $to
+  fi
+
+  if [[ $cpuUsage -gt $cpuThreshold ]];
+  then
+    echo "CPU Usage is at max" >> $mailfile
+    echo -e "\n" >> $mailfile
   fi
 }
 
-main(){
-#generateReport;
-checkResource;
+main() {
+  checkResourceAndSendMail;
+  rm $mailfile
 }
 main;
