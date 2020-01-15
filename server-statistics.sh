@@ -42,7 +42,7 @@ generateReport() {
 
   echo "<table border=1 style=width:100%>"  
   ps -eo pid,%mem,%cpu,cmd --sort=-%mem | head -10 | awk '{ print "<tr>" "<td width=10%>" $1 "</td>" "<td width=10%>" $2 "</td>" "<td width=10%>" $3 "</td>" "<td width=70%>" $4  $5 $6"</td>" "</tr>" }'   
-   echo "</table>"  
+  echo "</table>"  
   
   echo "<h4> OpenSpecimen Administrator </h4>"  
   echo "<center> Contact on  <a href='support.krishagni.com'> support@krishagni.com </a> for any OpnSpecimen issues. </center>"  
