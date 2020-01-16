@@ -1,7 +1,7 @@
 # Sending mails from Linux
 
 
-## Install the SSMTP utility
+### Install the SSMTP utility
 
 ##### For Ubuntu
 
@@ -18,7 +18,7 @@ Run the below command on terminal:
 >> sudo yum install ssmtp
 
 
-## Configure files to send emails.
+#### Configure files to send emails.
 
 Before moving to the configuration we need to add our Linux user to mail group. Using below command.
 >> usermod -a -G groupname username
@@ -45,11 +45,11 @@ In above example my mail server is gmail. You can configure the values as per yo
 Once the configuration is done lets send the mail using ssmtp uility.
 
 
-## Send emails
+#### Send emails
 
 This can be called as "Hello World" program of testing mail functionality. 
 
->> echo "Hello World" | ssmtp myfriendmail@gmail.com
+>> echo "Hello World" \| ssmtp myfriendmail@gmail.com
 
 
 
