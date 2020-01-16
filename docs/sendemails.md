@@ -1,30 +1,32 @@
 # Sending mails from Linux
 
 
->> Install the SSMTP utility
+## Install the SSMTP utility
 
-#### For Ubuntu
+##### For Ubuntu
 
 Run the below command on terminal:
 
-``` 
-sudo apt-get install ssmtp
-```
 
-#### CentOs/RedHat
+>> sudo apt-get install ssmtp
+
+
+##### CentOs/RedHat
 
 Run the below command on terminal: 
 
-```
-sudo yum install ssmtp
-```
+>> sudo yum install ssmtp
 
 
->> Configure files to send emails.
+## Configure files to send emails.
 
-Before moving to the configuration add your Linux user to mail group. It will provide access to edit mail configuration file.
+Before moving to the configuration we need to add our Linux user to mail group. Using below command.
+>> usermod -a -G groupname username
 
-Open  /etc/ssmtp/ssmtp.conf mail configuration file and add below properties into it.
+Reason for doing it is the our user can read/write the configuration file as well as send the mails.
+
+
+Open  /etc/ssmtp/ssmtp.conf mail configuration file and add below properties with it's proper values into it.
 
 ```
 mailhub=smtp.gmail.com:587
@@ -38,23 +40,24 @@ hostname=gmail.com
 
 ```
 
-Once the configuration is done lets send the mail from command line.
+In above example my mail server is gmail. You can configure the values as per your mail server.
+
+Once the configuration is done lets send the mail using ssmtp uility.
 
 
->> Send emails
+## Send emails
 
-Hello world program of sending mail. Run the below command.
+This can be called as "Hello World" program of testing mail functionality. 
 
-echo "Hello World" | ssmtp myfriendmail@gmail.com
+>> echo "Hello World" | ssmtp myfriendmail@gmail.com
 
-That's it just check if your friend recieves the message.
 
 
 ##### Error may occur while :
 
-``` 
-Authorization failed (535 5.7.8 https://support.google.com/mail/?p=BadCredentials k62sm6623445qkc.95 - gsmtp)
-```
+ 
+>> Authorization failed (535 5.7.8 https://support.google.com/mail/?p=BadCredentials k62sm6623445qkc.95 - gsmtp)
+
 
 
 To resolve the error make sure "Allow less secure app option is on for 'myacocunt@gmail.com' account.
