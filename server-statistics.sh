@@ -55,7 +55,7 @@ generateReport() {
   echo "<html>"  
   echo "<body>"  
   echo "<p> Hi customer, </p>"  
-  echo "<p> The server is consuming 90% of CPU or memory. Please check below detailed information.</p>"  
+  echo "<p> The server is consuming resources at its peak. Please check below detailed information. </p> 
 
   echo "<h3> Memory report: </h3>"
   echo "<table border=1 style=width:50%>"  
