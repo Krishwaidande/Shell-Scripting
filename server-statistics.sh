@@ -17,8 +17,8 @@ initVariables() {
   usedDisk=$(df -m | grep -w "$partition" | awk '{ print $3}')
   freeDisk=$(( (totalDisk - usedDisk)/1000 ))
 
-  #Threshold values
-  memThreshold=10
+  #Threshold values in percentage for memory/CPU and in GB for disk.
+  memThreshold=90
   cpuThreshold=90
   diskThreshold=2
 
@@ -46,7 +46,6 @@ topResourceConsumeProcesses() {
 topMemConsumeDirs() {
   echo "<table border=1 style=width:100%>"
   echo "<tr> <th> Directory </th> <th> Size </th> </tr>"  
-  #du -hsx /* --exclude=proc | sort -rh | head -10 | awk '{print "<tr> <td width=25%>" $2 "</td> <td width=25%>" $1 "</td> </tr>"}'
   find / -not -path "/proc/*" -type f -printf "%s\t%p\n" | sort -nr | head -10 | awk '{print "<tr> <td width=50%>" $2 "</td> <td width=50%>" (($1/1024)/1024) "MB </td> </tr>"}'
   echo "</table>"
   echo "<br>"
