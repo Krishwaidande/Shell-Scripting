@@ -81,11 +81,11 @@ generateReport() {
   echo "</table>"
   echo "<br>"
 
-  echo "<h4> Top 10 processes consuming more resources </h4>"
+  echo "<h4> Top 10 CPU consuming processes </h4>"
   topResourceConsumeProcesses $1;
   echo "<br>"
 
-  echo "<h4> Top 10 files consuming more space </h4>"
+  echo "<h4> Top 10 files by size </h4>"
   topMemConsumeDirs;
 
   echo "<h4> OpenSpecimen Administrator </h4>"  
