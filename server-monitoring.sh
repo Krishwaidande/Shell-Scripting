@@ -1,9 +1,6 @@
-#/bin/bash
+#!/bin/bash
 
 initVariables() {
-  mailfile="/home/user/scripts/server-statistics-$(date +%Y-%m-%d).txt"
-  touch $mailfile;
-
   #Memory information.
   totalMem=$(free -m | awk '{ if (NR > 1) print $2 }' | head -1)
   usedMem=$(free -m | awk '{ if (NR > 1) print $3 }' | head -1)
@@ -25,107 +22,105 @@ initVariables() {
   cpuThreshold=90
   diskThreshold=2
 
-  #Mail properties
-  to="krishna@krishagni.com"
-  from="krishna.jenkins@gmail.com"
-  subject="Alert !! os-demo server statistics"
-  contentType="text/html"
+  #Mail Properties
+  to='admin@gmail.com'
+  from='krishna.jenkins@gmail.com'
+  subject='Alert !! $(hostname) server statistics'
+  contentType='text/html'
 }
 
-printMailProps() {
-  echo "To: $to" 			>> $mailfile 
-  echo "From: $from" 			>> $mailfile  
-  echo "Subject: $subject" 		>> $mailfile  
-  echo "Content-Type: $contentType"  	>> $mailfile
+setMailProps() {
+  template+="To: $to \n"
+  template+="From: $from \n"
+  template+="Subject: $subject \n"
+  template+="Content-Type: $contentType \n"
 }
 
 topResourceConsumeProcesses() {
   resource=$1
-  echo "<table border=1 style=width:100%>" >> $mailfile  
-  ps -eo pid,%mem,%cpu,cmd --sort=-%$resource | head -10 | awk '{ print "<tr>" "<td width=10%>" $1 "</td>" "<td width=10%>" $2 "</td>" "<td width=10%>" $3 "</td>" "<td width=70%>" $4 $5 $6 "</td>" "</tr>" }'  >> $mailfile 
-  echo "</table>"  >> $mailfile
+  template+="<table border=1 style=width:100%>"
+  template+="$(ps -eo pid,%mem,%cpu,cmd --sort=-%$resource | head -11 | awk '{ print "<tr>" "<td width=10%>" $1 "</td>" "<td width=10%>" $2 "</td>" "<td width=10%>" $3 "</td>" "<td width=70%>" $4 $5 $6 "</td>" "</tr> \n" }')"
+  template+="</table>"
 }
 
 topMemConsumeDirs() {
-  echo "<table border=1 style=width:100%>" >> $mailfile
-  echo "<tr> <th> Directory </th> <th> Size </th> </tr>" >> $mailfile  
-  find / -not -path "/proc/*" -type f -printf "%s\t%p\n" | sort -nr | head -10 | awk '{print "<tr> <td width=50%>" $2 "</td> <td width=50%>" (($1/1024)/1024) "MB </td> </tr>"}' >> $mailfile
-  echo "</table>" >> $mailfile
-  echo "<br>" >> $mailfile
+  template+="<table border=1 style=width:100%>"
+  template+="<tr> <th> Directory </th> <th> Size </th> </tr>"
+  template+=$(find / -not -path "/proc/*" -type f -printf "%s\t%p\n" | sort -nr | head -11 | awk '{print "<tr> <td width=50%>" $2 "</td> <td width=50%>" (($1/1024)/1024) "MB </td> </tr>" }')
+  template+="</table>"
+  template+="<br>"
 }
 
 generateReport() {
-  echo "<html>" >> $mailfile 
-  echo "<body>" >> $mailfile
-  echo "<p> Hi customer, </p>" >> $mailfile  
-  echo "<p> The server is consuming resources at its peak. Please check below detailed information. </p>" >> $mailfile
+  template+="<html> \n"
+  template+="<body> \n"
+  template+="<p> Hi customer, </p>"
+  template+="<p> The server is consuming resources at its peak. Please check below detailed information. </p>"
 
-  echo "<h3> Memory report: </h3>" >> $mailfile
-  echo "<table border=1 style=width:50%>"  >> $mailfile
-  echo "<tr> <td width=25%> Total Memory  </td> <td width=25%> $totalMem MB </td> </tr>" >> $mailfile  
-  echo "<tr> <td width=25%> Used Memory   </td> <td width=25%> $usedMem MB </td> </tr>"  >> $mailfile
-  echo "<tr> <td width=25%> Free Memory   </td> <td width=25%> $freeMem MB </td> </tr>"  >> $mailfile
-  echo "<tr> <td width=25%> Used Memory in (%) </td> <td width=25%>  $percentMemUsed % </td> <tr>"  >> $mailfile
-  echo "</table>"  >> $mailfile
-  echo "<br>"  >> $mailfile
+  template+="<h3> Memory report: </h3>"
+  template+="<table border=1 style=width:50%>"
+  template+="<tr> <td width=25%> Total Memory  </td> <td width=25%> $totalMem MB </td> </tr>"
+  template+="<tr> <td width=25%> Used Memory   </td> <td width=25%> $usedMem MB </td> </tr>"
+  template+="<tr> <td width=25%> Free Memory   </td> <td width=25%> $freeMem MB </td> </tr>"
+  template+="<tr> <td width=25%> Used Memory in (%) </td> <td width=25%>  $percentMemUsed % </td> <tr>"
+  template+="</table>"
+  template+="<br>"
 
-  echo "<h3> CPU report: </h3>" >> $mailfile
-  echo "<table border=1 style=width:50%>" >> $mailfile
-  echo "<tr> <td width=25%> CPU Used  </td> <td width=25%> $percentCpuUsed % </td> </tr>" >> $mailfile
-  echo "<tr> <td width=25%> CPU Ideal </td> <td width=25%> $cpuIdeal % </td> </tr>" >> $mailfile
-  echo "</table>" >> $mailfile
-  echo "<br>" >> $mailfile
-  
-  echo "<h3> Disk report: </h3>" >> $mailfile
-  echo "<table border=1 style=width:50%>" >> $mailfile
-  echo "<tr> <td width=25%> Total Disk  </td> <td width=25%> "$(( $totalDisk/1000 ))" GB </td> </tr>" >> $mailfile
-  echo "<tr> <td width=25%> Used Disk   </td> <td width=25%> "$(( $usedDisk/1000 )) " GB </td> </tr>" >> $mailfile
-  echo "<tr> <td width=25%> Free Disk   </td> <td width=25%> $freeDisk  GB </td> </tr>" >> $mailfile
-  echo "</table>" >> $mailfile
-  echo "<br>" >> $mailfile
+  template+="<h3> CPU report: </h3>"
+  template+="<table border=1 style=width:50%>"
+  template+="<tr> <td width=25%> CPU Used  </td> <td width=25%> $percentCpuUsed % </td> </tr>"
+  template+="<tr> <td width=25%> CPU Ideal </td> <td width=25%> $cpuIdeal % </td> </tr>"
+  template+="</table>"
+  template+="<br>"
 
-  echo "<h4> Top 10 CPU consuming processes  </h4>" >> $mailfile
+  template+="<h3> Disk report: </h3>"
+  template+="<table border=1 style=width:50%>"
+  template+="<tr> <td width=25%> Total Disk  </td> <td width=25%> "$(( $totalDisk/1000 ))" GB </td> </tr>"
+  template+="<tr> <td width=25%> Used Disk   </td> <td width=25%> "$(( $usedDisk/1000 ))" GB </td> </tr>"
+  template+="<tr> <td width=25%> Free Disk   </td> <td width=25%> $freeDisk  GB </td> </tr>"
+  template+="</table>"
+  template+="<br>"
+
+  template+="<h4> Top 10 CPU consuming processes  </h4>"
   topResourceConsumeProcesses $1;
-  echo "<br>" >> $mailfile
+  template+="<br>"
 
-  echo "<h4> Top 10 files by size  </h4>" >> $mailfile
+  template+="<h4> Top 10 files by size  </h4>"
   topMemConsumeDirs;
 
-  echo "<h4> OpenSpecimen Administrator </h4>"  >> $mailfile
-  echo "<center> Contact on  <a href='support.krishagni.com'> support@krishagni.com </a> for any OpnSpecimen issues. </center>" >> $mailfile 
-  echo "</body>" >> $mailfile 
-  echo "</html>" >> $mailfile
+  template+="<h4> OpenSpecimen Administrator </h4>"
+  template+="<center> Contact on  <a href='support.krishagni.com'> support@krishagni.com </a> for any OpnSpecimen issues. </center> \n"
+  template+="</body> \n"
+  template+="</html> \n"
 }
 
 monitorResource() {
   if [ $percentMemUsed -gt $memThreshold ];
   then
-    printMailProps;
-    generateReport "mem"; 
-    cat $mailfile | /usr/sbin/ssmtp -v $to
+    generateReport "mem";
+    echo -e "$template" | /usr/sbin/ssmtp -v $to
     return;
   fi
-
+  
   if [ $percentCpuUsed -gt $cpuThreshold ];
   then
-    printMailProps;
     generateReport "cpu";
-    cat $mailfile | /usr/sbin/ssmtp -v $to
+    echo -e "$template" | /usr/sbin/ssmtp -v $to
+    return;
+  fi
+  
+  if [ $diskThreshold -gt $freeDisk ];
+  then
+    generateReport "mem";
+    echo -e "$template" | /usr/sbin/ssmtp -v $to
     return;
   fi
 
-  if [ $diskThreshold -gt $freeDisk ];
-  then
-    printMailProps;
-    generateReport "mem";
-    cat $mailfile | /usr/sbin/ssmtp -v $to
-    return;
-  fi
 }
 
 main() {
   initVariables;
+  setMailProps;
   monitorResource;
-  rm $mailfile
 }
 main;
