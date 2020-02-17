@@ -27,6 +27,22 @@ initVariables() {
   from='krishna.jenkins@gmail.com'
   subject='Alert !! $(hostname) server statistics'
   contentType='text/html'
+  
+  #CheckOsHealth variables
+  appUrl=$1
+  openspecimen_logs="/home/user/app/openspecimen/data/logs"
+
+  if [ -z "$appUrl" ]; then
+     echo "Provide the application URL as command line arg to script.";
+     echo "Run the script as ./server-monitoring.sh <openspecimen url>";
+     exit 0;
+  fi
+
+  #Port Monitoring
+  usedPorts=$(nmap -sT -p- 142.93.114.79 | awk 'NR>=7' | grep -w '80\|22\|443\|8009')
+  allPorts=$(nmap -sT -p- 142.93.114.79 | awk 'NR>=7')
+  diffPorts=$(diff <(echo "$usedPorts") <(echo "$allPorts"))
+  openPorts=$(echo "$diffPorts" | sed 's/>//g' | sed '/\/tcp/!d')
 }
 
 setMailProps() {
@@ -88,6 +104,41 @@ generateReport() {
   template+="<h4> Top 10 files by size  </h4>"
   topMemConsumeDirs;
 
+  setFooter;
+}
+
+sendOsHealthAlert() {
+  subject="Alert !! $(hostname) OpenSpecimen is down."
+  template+="Subject: $subject \n"
+
+  template+="<html> \n"
+  template+="<body> \n"
+  template+="<p> Hi customer, </p> \n"
+  template+="<p> The OpenSpecimen server is down please check $openspecimen_logs/os.log file to find reason. </p> \n"
+
+  setFooter;
+  echo -e $template | /usr/sbin/ssmtp -v $to
+}
+
+sendPortAlert() {
+  subject="Alert !! $(hostname) ports are open"
+  template+="Subject: $subject \n"
+
+  template+="<html> \n"
+  template+="<body> \n"
+  template+="<p> Hi customer, </p> \n"
+  template+="<p> The OpenSpecimen server's below ports are open. Contact system/network administrator to check why these ports are open. </p> \n"
+
+  template+="<table border=1 style=width:100%>"
+  template+="<tr> <th width=33% align=left> Port </th> <th width=33% align=left> Status </th> <th width=33% align=left> Service </th> </tr>"
+  template+="$(echo "$openPorts" | awk '{ print "<tr> <td width=33%>" $1 "</td> <td width=33%>" $2 "</td> <td width=33%>" $3 "</td> </tr>" }')"
+  template+="</table>"
+
+  setFooter;
+  echo -e $template | /usr/sbin/ssmtp -v $to
+}
+
+setFooter(){
   template+="<h4> OpenSpecimen Administrator </h4>"
   template+="<center> Contact on  <a href='support.krishagni.com'> support@krishagni.com </a> for any OpnSpecimen issues. </center> \n"
   template+="</body> \n"
@@ -118,9 +169,30 @@ monitorResource() {
 
 }
 
+invoke_server_api() {
+  wget --no-check-certificate -o applog  $appUrl/rest/ng/config-settings/app-props
+  rc=$?;
+  if [ $rc -eq 0 ]
+  then
+    echo "App is running";
+  else
+    setMailProps;
+    sendOsHealthAlert;
+  fi
+}
+
+portMonitoring() {
+  if [ ! -z "$openPorts" ]
+  then
+    sendPortAlert;
+  fi
+}
+
 main() {
   initVariables;
   setMailProps;
+  portMonitoring;
   monitorResource;
+  invoke_server_api $1;
 }
 main;
