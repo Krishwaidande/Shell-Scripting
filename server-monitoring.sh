@@ -189,10 +189,10 @@ portMonitoring() {
 }
 
 main() {
-  initVariables;
+  initVariables $1;
   setMailProps;
-  portMonitoring;
   monitorResource;
+  portMonitoring;
   invoke_server_api $1;
 }
-main;
+main $1;
