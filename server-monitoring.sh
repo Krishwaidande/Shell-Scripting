@@ -25,7 +25,6 @@ initVariables() {
   #Mail Properties
   to='admin@gmail.com'
   from='krishna.jenkins@gmail.com'
-  subject='Alert !! $(hostname) server statistics'
   contentType='text/html'
   
   #CheckOsHealth variables
@@ -48,7 +47,6 @@ initVariables() {
 setMailProps() {
   template+="To: $to \n"
   template+="From: $from \n"
-  template+="Subject: $subject \n"
   template+="Content-Type: $contentType \n"
 }
 
@@ -68,6 +66,9 @@ topMemConsumeDirs() {
 }
 
 generateReport() {
+  subject="Alert !! $(hostname) server statistics"
+  template+="Subject: $subject \n"
+  
   template+="<html> \n"
   template+="<body> \n"
   template+="<p> Hi customer, </p>"
