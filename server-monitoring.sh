@@ -41,7 +41,7 @@ initVariables() {
   usedPorts=$(nmap -sT -p- 142.93.114.79 | awk 'NR>=7' | grep -w '80\|22\|443\|8009')
   allPorts=$(nmap -sT -p- 142.93.114.79 | awk 'NR>=7')
   diffPorts=$(diff <(echo "$usedPorts") <(echo "$allPorts"))
-  openPorts=$(echo "$diffPorts" | sed 's/>//g' | sed '/\/tcp/!d')
+  openPorts=$(echo "$diffPorts" | sed 's/>//g' | sed 's/<//g' | sed '/\/tcp/!d')
 }
 
 setMailProps() {
