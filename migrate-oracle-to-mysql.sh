@@ -2,7 +2,7 @@
 
 tableNames="";
 mysqlDataDir="/usr/local/mysql/data";
-connectionString='sqlplus -s os_fresh/openspecimen'
+connectionString='sqlplus -s orauser/password'
 
 getTableNames() {
 tableNames=$($connectionString  <<EOF
