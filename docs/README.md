@@ -1,8 +1,8 @@
-### Shell Scripting projects:
+## Shell Scripting projects:
 
-> Server Monitoring script.
+#### [Server Monitoring script](https://github.com/Krishwaidande/Shell-Scripting/blob/master/server-monitoring.sh).
 
-This script monitors the memory, CPU, disk and ports of the server. It sends alert with proper report via email when it exceeds a decided threshold.
+This script monitors the memory, CPU, disk and ports of the server. It sends alert with proper report via email when it exceeds a decided threshold. This script can be configured to after certain time to monitor the resources. 
 
 The report contains.
 1. Total, used, free memory, used memory in (%).
@@ -13,8 +13,14 @@ The report contains.
 
 With above functionality, it also monitors the ports of the server. If any port is open other than standerd ports like (22, 80, 443) then script sends an alert message saying the port is open.
 
+Mail template:
 
-> Migration of Oracle to MySQL.
+![Mail-alert1](server-monitoring-alert-mail1.png)
+
+![Mail-alert2](server-monitoring-alert-mail2.png)
+
+
+#### [Migration of Oracle to MySQL](https://github.com/Krishwaidande/Shell-Scripting/blob/master/migrate-oracle-to-mysql.sh).
 
 Working of the script:
 1. Exports the Oracle table data into CSV file.
