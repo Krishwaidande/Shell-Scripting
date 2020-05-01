@@ -32,6 +32,10 @@ The script is checked-in [here](https://github.com/Krishwaidande/Shell-Scripting
 
 >> Command to run script : ./server-monitoring.sh
 
+If any of the resource is consuming power more than threshold below mail alert will be send.
+
+#### Report mail:
+
 ![Mail-alert1](server-monitoring-alert-mail1.png)
 
 ![Mail-alert2](server-monitoring-alert-mail2.png)
