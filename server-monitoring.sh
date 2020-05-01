@@ -4,8 +4,8 @@ emailBody=""
 emailSubject="Something went wrong."
 
 initVariables() {
-  to='krishna@krishagni.com'
-  from='krishna.jenkins@gmail.com'
+  to='krishna@gmail.com'
+  from='krishna@demo.com'
   contentType='text/html'
   
   partitions="/dev/vda1"
